@@ -1,0 +1,19 @@
+{
+  "name": "chat-app",
+  "version": "1.0.0",
+  "description": "Node based Chat Application using Sockets",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/duinneacha/chat-app.git"
+  },
+  "author": "Aidan Dennehy with help from Andrew Mead",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/duinneacha/chat-app/issues"
+  },
+  "homepage": "https://github.com/duinneacha/chat-app#readme"
+}
