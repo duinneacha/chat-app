@@ -22,14 +22,20 @@ io.on('connection', (socket) => {
   console.log('New user connected')
 
 
-  socket.emit('newMessage', {
-    from: 'localHost',
-    text: 'Message from the middle',
-    createdAt: 324324
-  })
+  // Emit a message to a single client
+  // socket.emit('newMessage', {
+  //   from: 'localHost',
+  //   text: 'Message from the middle',
+  //   createdAt: 324324
+  // })
 
   socket.on('createMessage', (message) => {
     console.log('createMessage', message);
+    io.emit('newMessage', {
+      from: message.from,
+      text: message.text,
+      createdAt: new Date().getTime()
+    });
   });
 
   socket.on('disconnect', () => {
