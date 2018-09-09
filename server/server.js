@@ -36,14 +36,14 @@ io.on('connection', (socket) => {
   // Send a message to all clients connected (other than the connecting client) - using socket.broadcast.emit
   socket.broadcast.emit('newMessage', generateMessage('Admin', 'A new user has joined the chat room'));
 
-  socket.on('createMessage', (message) => {
+  socket.on('createMessage', (message, callback) => {
     console.log('createMessage', message);
-    // io.emit('newMessage', {
-    //   from: message.from,
-    //   text: message.text,
-    //   createdAt: new Date().getTime()
-    // });
-    socket.broadcast.emit('newMessage', generateMessage(message.from, message.text));
+
+    callback('>>> This is an acknowledgement from the Server <<<'); // calline the callback function sent from the emitter client
+
+    io.emit('newMessage', generateMessage(message.from, message.text));
+
+    //socket.broadcast.emit('newMessage', generateMessage(message.from, message.text));
 
   });
 
