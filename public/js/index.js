@@ -3,6 +3,8 @@ const sendButton = document.getElementById('sendButton');
 const messageForm = document.getElementById('messageForm');
 const chatMessage = document.getElementById('chatMessage');
 const messageList = document.getElementById("messages");
+const locationButton = document.getElementById('sendLocation')
+
 
 // Listen for an event on connect
 socket.on('connect', function () {
@@ -25,7 +27,13 @@ socket.on('newMessage', function (message) {
   const li = document.createElement('li');
   li.innerHTML = `${message.from}: ${message.text}`
   messageList.appendChild(li);
+  chatMessage.value = "";
+});
 
+socket.on('newLocationMessage', message => {
+  const li = document.createElement('li');
+  li.innerHTML = `<a target="_blank" href="${message.url}">${message.from} My current location</a>`;
+  messageList.appendChild(li);
 
 });
 
@@ -46,9 +54,22 @@ messageForm.addEventListener('submit', e => {
     from: 'User',
     text: chatMessage.value
   }, function () {
-    chatMessage.value = "";
+
   });
 
   console.log(chatMessage.value);
 });
 
+locationButton.addEventListener('click', e => {
+  if (!navigator.geolocation) {
+    return alert('GeoLocation not supported by your browser');
+  }
+
+  navigator.geolocation.getCurrentPosition(position => {
+    console.log(position);
+    socket.emit('createLocationMessage', {
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude
+    });
+  }, () => alert('Unable to fetch location'));
+});

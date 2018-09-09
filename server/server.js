@@ -3,7 +3,7 @@ const http = require('http');
 const publicPath = path.join(__dirname, './../public');
 const express = require('express');
 const socketIO = require('socket.io');
-const { generateMessage } = require('./utils/message');
+const { generateMessage, generateLocationMessage } = require('./utils/message');
 
 
 const port = process.env.PORT || 3000;
@@ -36,6 +36,8 @@ io.on('connection', (socket) => {
   // Send a message to all clients connected (other than the connecting client) - using socket.broadcast.emit
   socket.broadcast.emit('newMessage', generateMessage('Admin', 'A new user has joined the chat room'));
 
+
+  // Listener for the socket createMessage object
   socket.on('createMessage', (message, callback) => {
     console.log('createMessage', message);
 
@@ -44,7 +46,15 @@ io.on('connection', (socket) => {
     io.emit('newMessage', generateMessage(message.from, message.text));
 
     //socket.broadcast.emit('newMessage', generateMessage(message.from, message.text));
+  });
 
+  socket.on('createLocationMessage', (locationCoordinates) => {
+
+    // io.emit('newMessage', generateMessage('Admin', `${locationCoordinates.latitude}, ${locationCoordinates.longitude}`));
+    io.emit('newLocationMessage', generateLocationMessage('Admin', locationCoordinates.latitude, locationCoordinates.longitude));
+
+    // const sss = generateLocationMessage('Admin', locationCoordinates.latitude, locationCoordinates.longitude);
+    // console.log(sss);
   });
 
   socket.on('disconnect', () => {

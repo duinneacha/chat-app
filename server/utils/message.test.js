@@ -1,6 +1,6 @@
 const expect = require('expect');
 
-const { generateMessage } = require('./message');
+const { generateMessage, generateLocationMessage } = require('./message');
 
 describe('generateMessage', () => {
   it('should generate the correct message object', () => {
@@ -22,4 +22,21 @@ describe('generateMessage', () => {
 
 
   });
+});
+
+
+describe('generateLocationMessage', () => {
+  it('should generate the correct message object', () => {
+    const from = 'Mocha';
+
+    const latitude = '51.9077888';
+    const longitude = '-8.2706432';
+    const glmReturnData = generateLocationMessage(from, latitude, longitude);
+    console.log(glmReturnData);
+
+    expect(glmReturnData.from).toBe(from);
+    expect(glmReturnData.url).toBe('https://www.google.com/maps?q=51.9077888,-8.2706432');
+    expect(typeof glmReturnData.createdAt).toBe('number');
+  });
+
 });
