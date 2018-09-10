@@ -9,25 +9,19 @@ const locationButton = document.getElementById('sendLocation')
 const scrollToBottom = () => {
 
   // Selectors
-  let newMessage
+  const lastMessage = messageList.lastChild;
 
   // Heights
   const mClientHeight = messageList.clientHeight;
   const mScrollTop = messageList.scrollTop;
   const mScrollHeight = messageList.scrollHeight;
-  const lastMessage = messageList.lastChild;
   const lastMessageHeight = lastMessage.clientHeight;
   const secondLastMessageHeight = (lastMessage.previousSibling === null) ? 0 : lastMessage.previousSibling.clientHeight;
 
+  // Check to see if the recently entered chat messages will dissapear off the screen - if so move the bottom visually
   if (mClientHeight + mScrollTop + lastMessageHeight + secondLastMessageHeight >= mScrollHeight) {
-    // console.log('clientHeight', mClientHeight);
-    // console.log('scrollTop', mScrollTop);
-    // console.log('scrollHeight', mScrollHeight);
-    // console.log('secondlastMessageHeight', secondLastMessageHeight);
-    // console.log('lastMessageHeight', lastMessageHeight);
 
-    console.log('Should Scroll');
-
+    // Scroll (keep) to the bottom of the message list if close to the end
     messages.scrollTo(0, mScrollHeight);
   }
 };
