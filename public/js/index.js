@@ -5,6 +5,8 @@ const chatMessage = document.getElementById('chatMessage');
 const messageList = document.getElementById("messages");
 const locationButton = document.getElementById('sendLocation')
 
+// const mmm = Mustache.render("sdsdsd");
+
 // Listen for an event on connect
 socket.on('connect', function () {
   console.log('Connected to the server');
@@ -22,19 +24,32 @@ socket.on('disconnect', function () {
 });
 
 socket.on('newMessage', message => {
-  console.log('newMessage', message);
 
   const formattedTime = moment(message.createdAt).format('h:mm a');
+  const template = document.getElementById('message-template').innerHTML;
+  const html = Mustache.render(template, {
+    text: message.text,
+    from: message.from,
+    createdAt: formattedTime
+  });
   const li = document.createElement('li');
-  li.innerHTML = `${message.from} ${formattedTime}: ${message.text}`
+  li.innerHTML = html;
+
   messageList.appendChild(li);
-  // chatMessage.value = "";
 });
 
 socket.on('newLocationMessage', message => {
+
   const formattedTime = moment(message.createdAt).format('h:mm a');
+  const template = document.getElementById('location-message-template').innerHTML;
+  const html = Mustache.render(template, {
+    url: message.url,
+    from: message.from,
+    createdAt: formattedTime
+  });
+
   const li = document.createElement('li');
-  li.innerHTML = `<a target="_blank" href="${message.url}">${message.from} ${formattedTime} My current location</a>`;
+  li.innerHTML = html;
   messageList.appendChild(li);
 
 });
@@ -47,8 +62,6 @@ socket.on('newLocationMessage', message => {
 // }, function (dataFromServer) {
 //   console.log('received message', dataFromServer);
 // });
-
-
 
 messageForm.addEventListener('submit', e => {
   e.preventDefault();
