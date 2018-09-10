@@ -5,18 +5,36 @@ const chatMessage = document.getElementById('chatMessage');
 const messageList = document.getElementById("messages");
 const locationButton = document.getElementById('sendLocation')
 
-// const mmm = Mustache.render("sdsdsd");
+
+const scrollToBottom = () => {
+
+  // Selectors
+  let newMessage
+
+  // Heights
+  const mClientHeight = messageList.clientHeight;
+  const mScrollTop = messageList.scrollTop;
+  const mScrollHeight = messageList.scrollHeight;
+  const lastMessage = messageList.lastChild;
+  const lastMessageHeight = lastMessage.clientHeight;
+  const secondLastMessageHeight = (lastMessage.previousSibling === null) ? 0 : lastMessage.previousSibling.clientHeight;
+
+  if (mClientHeight + mScrollTop + lastMessageHeight + secondLastMessageHeight >= mScrollHeight) {
+    // console.log('clientHeight', mClientHeight);
+    // console.log('scrollTop', mScrollTop);
+    // console.log('scrollHeight', mScrollHeight);
+    // console.log('secondlastMessageHeight', secondLastMessageHeight);
+    // console.log('lastMessageHeight', lastMessageHeight);
+
+    console.log('Should Scroll');
+
+    messages.scrollTo(0, mScrollHeight);
+  }
+};
 
 // Listen for an event on connect
 socket.on('connect', function () {
   console.log('Connected to the server');
-
-
-  // socket.emit('createMessage', {
-  //   from: "Aidan",
-  //   text: "Message successfully transmitted"
-  // });
-
 });
 
 socket.on('disconnect', function () {
@@ -34,8 +52,8 @@ socket.on('newMessage', message => {
   });
   const li = document.createElement('li');
   li.innerHTML = html;
-
   messageList.appendChild(li);
+  scrollToBottom();
 });
 
 socket.on('newLocationMessage', message => {
@@ -51,7 +69,7 @@ socket.on('newLocationMessage', message => {
   const li = document.createElement('li');
   li.innerHTML = html;
   messageList.appendChild(li);
-
+  scrollToBottom();
 });
 
 
@@ -65,16 +83,19 @@ socket.on('newLocationMessage', message => {
 
 messageForm.addEventListener('submit', e => {
   e.preventDefault();
-  socket.emit('createMessage', {
-    from: 'User',
-    text: chatMessage.value
-  }, function () {
 
-    // The server responded here, chear the message box of text
-    chatMessage.value = '';
-  });
+  if (chatMessage.value !== '') {
+    socket.emit('createMessage', {
+      from: 'User',
+      text: chatMessage.value
+    }, function () {
 
-  console.log(chatMessage.value);
+      // The server responded here, chear the message box of text
+      chatMessage.value = '';
+    });
+
+  }
+
 });
 
 locationButton.addEventListener('click', e => {
