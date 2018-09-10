@@ -5,7 +5,6 @@ const chatMessage = document.getElementById('chatMessage');
 const messageList = document.getElementById("messages");
 const locationButton = document.getElementById('sendLocation')
 
-
 // Listen for an event on connect
 socket.on('connect', function () {
   console.log('Connected to the server');
@@ -24,15 +23,18 @@ socket.on('disconnect', function () {
 
 socket.on('newMessage', message => {
   console.log('newMessage', message);
+
+  const formattedTime = moment(message.createdAt).format('h:mm a');
   const li = document.createElement('li');
-  li.innerHTML = `${message.from}: ${message.text}`
+  li.innerHTML = `${message.from} ${formattedTime}: ${message.text}`
   messageList.appendChild(li);
   // chatMessage.value = "";
 });
 
 socket.on('newLocationMessage', message => {
+  const formattedTime = moment(message.createdAt).format('h:mm a');
   const li = document.createElement('li');
-  li.innerHTML = `<a target="_blank" href="${message.url}">${message.from} My current location</a>`;
+  li.innerHTML = `<a target="_blank" href="${message.url}">${message.from} ${formattedTime} My current location</a>`;
   messageList.appendChild(li);
 
 });
