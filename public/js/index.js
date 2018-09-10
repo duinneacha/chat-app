@@ -22,12 +22,12 @@ socket.on('disconnect', function () {
   console.log('Disconnected from server');
 });
 
-socket.on('newMessage', function (message) {
+socket.on('newMessage', message => {
   console.log('newMessage', message);
   const li = document.createElement('li');
   li.innerHTML = `${message.from}: ${message.text}`
   messageList.appendChild(li);
-  chatMessage.value = "";
+  // chatMessage.value = "";
 });
 
 socket.on('newLocationMessage', message => {
@@ -55,6 +55,8 @@ messageForm.addEventListener('submit', e => {
     text: chatMessage.value
   }, function () {
 
+    // The server responded here, chear the message box of text
+    chatMessage.value = '';
   });
 
   console.log(chatMessage.value);
@@ -65,11 +67,19 @@ locationButton.addEventListener('click', e => {
     return alert('GeoLocation not supported by your browser');
   }
 
+  locationButton.disabled = true;
+  locationButton.innerText = 'Locating . . . . .';
+
   navigator.geolocation.getCurrentPosition(position => {
-    console.log(position);
+    locationButton.disabled = false;
+    locationButton.innerText = 'Send Location';
     socket.emit('createLocationMessage', {
       latitude: position.coords.latitude,
       longitude: position.coords.longitude
     });
-  }, () => alert('Unable to fetch location'));
+  }, () => {
+    alert('Unable to fetch location');
+    locationButton.disabled = false;
+    locationButton.innerText = 'Send Location';
+  });
 });

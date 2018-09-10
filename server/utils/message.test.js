@@ -32,7 +32,6 @@ describe('generateLocationMessage', () => {
     const latitude = '51.9077888';
     const longitude = '-8.2706432';
     const glmReturnData = generateLocationMessage(from, latitude, longitude);
-    console.log(glmReturnData);
 
     expect(glmReturnData.from).toBe(from);
     expect(glmReturnData.url).toBe('https://www.google.com/maps?q=51.9077888,-8.2706432');

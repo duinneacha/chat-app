@@ -44,6 +44,7 @@ io.on('connection', (socket) => {
     callback('>>> This is an acknowledgement from the Server <<<'); // calline the callback function sent from the emitter client
 
     io.emit('newMessage', generateMessage(message.from, message.text));
+    callback();
 
     //socket.broadcast.emit('newMessage', generateMessage(message.from, message.text));
   });
