@@ -22,16 +22,16 @@ socket.on('connect', function () {
       alert(err);
       window.location.href = '/';
     } else {
-      console.log('no error');
+      //console.log('no error');
     }
   })
 
 
-  console.log('Connected to the server');
+  //console.log('Connected to the server');
 });
 
 socket.on('disconnect', function () {
-  console.log('Disconnected from server');
+  //console.log('Disconnected from server');
 });
 
 // Listen for updated user list
@@ -116,7 +116,7 @@ messageForm.addEventListener('submit', e => {
 
   if (chatMessage.value !== '') {
     socket.emit('createMessage', {
-      from: 'User',
+      // from: chatMessage.name,
       text: chatMessage.value
     }, function () {
 

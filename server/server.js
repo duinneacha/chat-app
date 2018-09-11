@@ -25,7 +25,7 @@ app.use(express.static(publicPath));
 
 // Listen for a connection
 io.on('connection', (socket) => {
-  console.log('New user connected')
+  //console.log('New user connected')
 
 
   // Emit a message to a single client
@@ -71,14 +71,22 @@ io.on('connection', (socket) => {
   // Listener for the socket createMessage object
   socket.on('createMessage', (message, callback) => {
 
+    var user = users.getUser(socket.id);
+
+    if (user && isRealString(message.text)) {
+      io.to(user.room).emit('newMessage', generateMessage(user.name, message.text));
+    }
+
     callback('>>> This is an acknowledgement from the Server <<<'); // calling the callback function sent from the emitter client
 
-    io.emit('newMessage', generateMessage(message.from, message.text));
-    callback();
   });
 
   socket.on('createLocationMessage', (locationCoordinates) => {
-    io.emit('newLocationMessage', generateLocationMessage('Admin', locationCoordinates.latitude, locationCoordinates.longitude));
+    var user = users.getUser(socket.id);
+    if (user) {
+      io.to(user.room).emit('newLocationMessage', generateLocationMessage(user.name, locationCoordinates.latitude, locationCoordinates.longitude));
+    }
+
   });
 
   socket.on('disconnect', () => {
