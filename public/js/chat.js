@@ -5,9 +5,37 @@ const chatMessage = document.getElementById('chatMessage');
 const messageList = document.getElementById("messages");
 const locationButton = document.getElementById('sendLocation')
 
+// Listen for an event on connect
+socket.on('connect', function () {
+  let qd = {};
+  if (window.location.search) {
+    window.location.search.substr(1).split`&`.forEach(item => { let [k, v] = item.split`=`; v = v && decodeURIComponent(v); (qd[k] = qd[k] || []).push(v) })
+  }
+
+  const params = {
+    name: qd['name'][0],
+    room: qd['room'][0]
+  }
+
+  socket.emit('join', params, (err) => {
+    if (err) {
+      alert(err);
+      window.location.href = '/';
+    } else {
+      console.log('no error');
+    }
+  })
+
+
+  console.log('Connected to the server');
+});
+
+socket.on('disconnect', function () {
+  console.log('Disconnected from server');
+});
+
 
 const scrollToBottom = () => {
-
   // Selectors
   const lastMessage = messageList.lastChild;
 
@@ -26,14 +54,7 @@ const scrollToBottom = () => {
   }
 };
 
-// Listen for an event on connect
-socket.on('connect', function () {
-  console.log('Connected to the server');
-});
 
-socket.on('disconnect', function () {
-  console.log('Disconnected from server');
-});
 
 socket.on('newMessage', message => {
 

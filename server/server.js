@@ -4,6 +4,7 @@ const publicPath = path.join(__dirname, './../public');
 const express = require('express');
 const socketIO = require('socket.io');
 const { generateMessage, generateLocationMessage } = require('./utils/message');
+const { isRealString } = require('./utils/validation');
 
 
 const port = process.env.PORT || 3000;
@@ -30,18 +31,39 @@ io.on('connection', (socket) => {
   //   createdAt: 324324
   // })
 
-  // Send a message to the client that has just requested - using socket.emit
-  socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
 
-  // Send a message to all clients connected (other than the connecting client) - using socket.broadcast.emit
-  socket.broadcast.emit('newMessage', generateMessage('Admin', 'A new user has joined the chat room'));
+  // Listen for users joining the chat service
+  socket.on('join', (params, callback) => {
+    if (!isRealString(params.name) || !isRealString(params.room)) {
+      callback('Name and Room are required');
+    }
 
+    // Join the room
+    socket.join(params.room);
+
+    // socket.leave
+    // socket.leave(params.room);
+
+    // io.emit -> io.to(params.room).emit
+    // socket.broadcast.emit -> socket.broadcast.to(params.room).emit
+    // socket.emit
+
+
+    // Send a message to the client that has just requested - using socket.emit
+    socket.emit('newMessage', generateMessage('Admin', `${params.name} has joined.`));
+
+    // Send a message to all clients connected (except for the connecting client) - using socket.broadcast.emit
+    socket.broadcast.to(params.room).emit('newMessage', generateMessage('Admin', `${params.name} has joined the chat room`));
+
+    callback();
+
+  });
 
   // Listener for the socket createMessage object
   socket.on('createMessage', (message, callback) => {
     console.log('createMessage', message);
 
-    callback('>>> This is an acknowledgement from the Server <<<'); // calline the callback function sent from the emitter client
+    callback('>>> This is an acknowledgement from the Server <<<'); // calling the callback function sent from the emitter client
 
     io.emit('newMessage', generateMessage(message.from, message.text));
     callback();
