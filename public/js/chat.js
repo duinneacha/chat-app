@@ -34,6 +34,21 @@ socket.on('disconnect', function () {
   console.log('Disconnected from server');
 });
 
+// Listen for updated user list
+socket.on('updateUserList', userArray => {
+
+  const usersDiv = document.getElementById('users');
+  usersDiv.innerHTML = "";
+
+  var olList = document.createElement('ol');
+  userArray.forEach((user) => {
+    let newLI = document.createElement('li');
+    newLI.innerHTML = user;
+    olList.appendChild(newLI)
+  })
+  usersDiv.appendChild(olList);
+
+})
 
 const scrollToBottom = () => {
   // Selectors

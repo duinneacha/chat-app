@@ -5,6 +5,7 @@ const express = require('express');
 const socketIO = require('socket.io');
 const { generateMessage, generateLocationMessage } = require('./utils/message');
 const { isRealString } = require('./utils/validation');
+const { Users } = require('./utils/users');
 
 
 const port = process.env.PORT || 3000;
@@ -14,6 +15,9 @@ var server = http.createServer(app);
 
 // Create the websockets server
 var io = socketIO(server);
+
+// Create a users object
+var users = new Users();
 
 // Let node know the static folder
 app.use(express.static(publicPath));
@@ -35,11 +39,16 @@ io.on('connection', (socket) => {
   // Listen for users joining the chat service
   socket.on('join', (params, callback) => {
     if (!isRealString(params.name) || !isRealString(params.room)) {
-      callback('Name and Room are required');
+      return callback('Name and Room are required');
     }
 
     // Join the room
     socket.join(params.room);
+    users.removeUser(socket.id);
+    users.addUser(socket.id, params.name, params.room);
+
+    // emit the new user list to everyone in the chat room
+    io.to(params.room).emit('updateUserList', users.getUserList(params.room));
 
     // socket.leave
     // socket.leave(params.room);
@@ -61,27 +70,27 @@ io.on('connection', (socket) => {
 
   // Listener for the socket createMessage object
   socket.on('createMessage', (message, callback) => {
-    console.log('createMessage', message);
 
     callback('>>> This is an acknowledgement from the Server <<<'); // calling the callback function sent from the emitter client
 
     io.emit('newMessage', generateMessage(message.from, message.text));
     callback();
-
-    //socket.broadcast.emit('newMessage', generateMessage(message.from, message.text));
   });
 
   socket.on('createLocationMessage', (locationCoordinates) => {
-
-    // io.emit('newMessage', generateMessage('Admin', `${locationCoordinates.latitude}, ${locationCoordinates.longitude}`));
     io.emit('newLocationMessage', generateLocationMessage('Admin', locationCoordinates.latitude, locationCoordinates.longitude));
-
-    // const sss = generateLocationMessage('Admin', locationCoordinates.latitude, locationCoordinates.longitude);
-    // console.log(sss);
   });
 
   socket.on('disconnect', () => {
-    console.log('Client disconnected');
+
+    // Remove the user from the chat room user array if they have disconnected
+    var user = users.removeUser(socket.id);
+
+    if (user) {
+      io.to(user.room).emit('updateUserList', users.getUserList(user.room));
+      io.to(user.room).emit('newMessage', generateMessage('Admin', `${user.name} has llleft`));
+    }
+
   });
 }); //io.on connection
 
